@@ -3,5 +3,5 @@
 version = 4
 
 [[package]]
-name = "mini-lisp"
+name = "mini_lisp"
 version = "0.1.0"
