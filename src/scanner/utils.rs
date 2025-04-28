@@ -59,6 +59,14 @@ fn recog_reserved(line: &str, row: usize, column: usize) -> Option<(TokenUnit, T
             Some("lambda") => Some(TokenUnit { token_type: TokenType::Lambda, table_ptr: "lambda".len() }),
             Some("quote") => Some(TokenUnit { token_type: TokenType::Quote, table_ptr: "quote".len() }),
             Some("\'") => Some(TokenUnit { token_type: TokenType::QuoteMark, table_ptr: "\'".len() }),
+            Some(other) => {
+                if let Some(start_ch) = other.chars().next() {
+                    match start_ch {
+                        '\'' => Some(TokenUnit { token_type: TokenType::QuoteMark, table_ptr: 1 }),
+                        _ => None,
+                    }
+                } else { None }
+            },
             _ => None,
         }
     } else { None };
