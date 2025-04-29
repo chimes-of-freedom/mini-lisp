@@ -5,7 +5,26 @@ use super::{ScanError, TokenUnit, TokenType, TableItem, ValueType};
 
 // 传入一个以非空白字符开头的字符串，识别出第一个词法单元，
 // 返回词法单元和符号表条目。（词法单元字符数暂存于TokenUnit.table_ptr中）
+// 识别顺序：
+// (1) 左右括号（除双引号外的界定符）
+// (2) 常量（含字符串）
+// (3) 特殊形式关键字
+// (4) 用户自定义标识符
+// (5) 算术运算符（过程）
+// (6) 逻辑运算符（过程）
 pub fn tokenize(line: &str, row: usize, column: usize) -> Result<(TokenUnit, TableItem), ScanError> {
+    if let Some(result) = recog_mark(line, row, column) {
+        return Ok(result);
+    }
+
+    // println!("not mark");
+
+    if let Some(result) = recog_const(line, row, column) {
+        return Ok(result);
+    }
+
+    // println!("not const");
+
     if let Some(result) = recog_reserved(line, row, column) {
         return Ok(result);
     }
@@ -17,12 +36,6 @@ pub fn tokenize(line: &str, row: usize, column: usize) -> Result<(TokenUnit, Tab
     }
 
     // println!("not id");
-
-    if let Some(result) = recog_const(line, row, column) {
-        return Ok(result);
-    }
-
-    // println!("not const");
 
     if let Some(result) = recog_op(line, row, column) {
         return Ok(result);
@@ -36,15 +49,63 @@ pub fn tokenize(line: &str, row: usize, column: usize) -> Result<(TokenUnit, Tab
 
     // println!("not cmp");
 
-    if let Some(result) = recog_mark(line, row, column) {
-        return Ok(result);
-    }
-
-    // println!("not mark");
-
     panic!("line doesn't have any matches");
 
     // Err(ScanError::InvalidCharacter(0))
+}
+
+
+fn recog_mark(line: &str, row: usize, column: usize) -> Option<(TokenUnit, TableItem)> {
+    let token_unit = if let Some(ch) = line.chars().next() {
+        match ch {
+            '(' => Some(TokenUnit { token_type: TokenType::LParen, table_ptr: 1 }),
+            ')' => Some(TokenUnit { token_type: TokenType::RParen, table_ptr: 1 }),
+            // '\"' => Some(TokenUnit { token_type: TokenType::DQuote, table_ptr: 1 }),
+            _ => None,
+        }
+    } else {
+        None
+    };
+
+    match token_unit {
+        Some(token_unit) => Some((token_unit, TableItem {
+            index: (row, column),
+            value: None,
+        })),
+        _ => None,
+    }
+}
+
+
+fn recog_const(line: &str, row: usize, column: usize) -> Option<(TokenUnit, TableItem)> {
+    if line.starts_with("\"") {
+        for (i, ch) in line.chars().enumerate() {
+            if i != 0 && ch == '\"' {
+                return Some((TokenUnit {
+                    token_type: TokenType::Const,
+                    table_ptr: i + 1
+                }, TableItem {
+                    index: (row, column),
+                    value: Some(ValueType::Str(String::from(&line[1..i])))
+                }))
+            }
+        }
+        return None;
+    }
+    if let Some(first) = line.split_whitespace().next() {
+        if let Some(first) = first.split(|c| c == '(' || c == ')' || c == '\"').next() {
+            match parse_const(first) {
+                Some((value_type, token_len)) => Some((TokenUnit {
+                    token_type: TokenType::Const,
+                    table_ptr: token_len,
+                }, TableItem {
+                    index: (row, column),
+                    value: Some(value_type),
+                })),
+                _ => None,
+            }
+        } else { None }
+    } else { None }
 }
 
 
@@ -105,24 +166,6 @@ fn recog_id(line: &str, row: usize, column: usize) -> Option<(TokenUnit, TableIt
 }
 
 
-fn recog_const(line: &str, row: usize, column: usize) -> Option<(TokenUnit, TableItem)> {
-    if let Some(first) = line.split_whitespace().next() {
-        if let Some(first) = first.split(|c| c == '(' || c == ')' || c == '\"').next() {
-            match parse_const(first) {
-                Some((value_type, token_len)) => Some((TokenUnit {
-                    token_type: TokenType::Const,
-                    table_ptr: token_len,
-                }, TableItem {
-                    index: (row, column),
-                    value: Some(value_type),
-                })),
-                _ => None,
-            }
-        } else { None }
-    } else { None }
-}
-
-
 fn recog_op(line: &str, row: usize, column: usize) -> Option<(TokenUnit, TableItem)> {
     let token_unit = if let Some(first) = line.split_whitespace().next() {
         if let Some(first) = first.split(|c| c == '(' || c == ')' || c == '\"').next() {
@@ -159,28 +202,6 @@ fn recog_cmp(line: &str, row: usize, column: usize) -> Option<(TokenUnit, TableI
             }
         } else { None }
     } else { None };
-
-    match token_unit {
-        Some(token_unit) => Some((token_unit, TableItem {
-            index: (row, column),
-            value: None,
-        })),
-        _ => None,
-    }
-}
-
-
-fn recog_mark(line: &str, row: usize, column: usize) -> Option<(TokenUnit, TableItem)> {
-    let token_unit = if let Some(ch) = line.chars().next() {
-        match ch {
-            '(' => Some(TokenUnit { token_type: TokenType::LParen, table_ptr: 1 }),
-            ')' => Some(TokenUnit { token_type: TokenType::RParen, table_ptr: 1 }),
-            '\"' => Some(TokenUnit { token_type: TokenType::DQuote, table_ptr: 1 }),
-            _ => None,
-        }
-    } else {
-        None
-    };
 
     match token_unit {
         Some(token_unit) => Some((token_unit, TableItem {
