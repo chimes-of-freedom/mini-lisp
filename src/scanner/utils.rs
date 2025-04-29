@@ -78,9 +78,11 @@ fn recog_mark(line: &str, row: usize, column: usize) -> Option<(TokenUnit, Table
 
 
 fn recog_const(line: &str, row: usize, column: usize) -> Option<(TokenUnit, TableItem)> {
+    // 字符串识别（双引号的特性使得字符串须单独写识别逻辑）
     if line.starts_with("\"") {
+        let mut pre_escape = false;
         for (i, ch) in line.chars().enumerate() {
-            if i != 0 && ch == '\"' {
+            if i != 0 && ch == '\"' && !pre_escape {
                 return Some((TokenUnit {
                     token_type: TokenType::Const,
                     table_ptr: i + 1
@@ -89,9 +91,11 @@ fn recog_const(line: &str, row: usize, column: usize) -> Option<(TokenUnit, Tabl
                     value: Some(ValueType::Str(String::from(&line[1..i])))
                 }))
             }
+            pre_escape = ch == '\\';
         }
         return None;
     }
+
     if let Some(first) = line.split_whitespace().next() {
         if let Some(first) = first.split(|c| c == '(' || c == ')' || c == '\"').next() {
             match parse_const(first) {
