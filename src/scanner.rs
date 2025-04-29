@@ -9,9 +9,9 @@ pub struct TokenUnit {
 
 pub enum ScanError {
     // 不会出现在Lisp中的字符
-    InvalidCharacter(usize),
+    InvalidCharacter((usize, usize)),
     // 不期望在该处出现的字符
-    UnexpectedCharacter(usize),
+    UnexpectedCharacter((usize, usize)),
 }
 
 #[derive(Debug)]
@@ -83,7 +83,14 @@ pub fn scan(input: &str) -> Result<(Vec<TokenUnit>, Vec<TableItem>), ScanError> 
                     column += ws_cnt;
                     line = &line[ws_cnt..];
                 },
-                _ => { panic!("tokenize failed"); },
+                Err(scan_error) => match scan_error {
+                    ScanError::InvalidCharacter((row, column)) => {
+                        panic!("tokenize() failed at row {} column {}: Invalid Character", row + 1, column + 1);
+                    },
+                    ScanError::UnexpectedCharacter((row, column)) => {
+                        panic!("tokenize() failed at row {} column {}: Unexpected Character", row + 1, column + 1);
+                    }
+                },
             }
         }
     }

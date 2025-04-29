@@ -1,12 +1,12 @@
-use core::panic;
-
 use super::{ScanError, TokenUnit, TokenType, TableItem, ValueType};
 
 
+// 功能：
 // 传入一个以非空白字符开头的字符串，识别出第一个词法单元，
 // 返回词法单元和符号表条目。（词法单元字符数暂存于TokenUnit.table_ptr中）
+
 // 识别顺序：
-// (1) 左右括号（除双引号外的界定符）
+// (1) 左右括号（即除双引号外的界定符）
 // (2) 常量（含字符串）
 // (3) 特殊形式关键字
 // (4) 用户自定义标识符
@@ -49,7 +49,7 @@ pub fn tokenize(line: &str, row: usize, column: usize) -> Result<(TokenUnit, Tab
 
     // println!("not cmp");
 
-    panic!("line doesn't have any matches");
+    Err(ScanError::InvalidCharacter((row, column)))
 
     // Err(ScanError::InvalidCharacter(0))
 }
