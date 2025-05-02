@@ -154,7 +154,7 @@ fn recog_reserved(line: &str, row: usize, column: usize) -> Option<(TokenUnit, T
             Some("list") => Some(TokenUnit { token_type: TokenType::List, table_ptr: "list".len() }),
             Some("cons") => Some(TokenUnit { token_type: TokenType::Cons, table_ptr: "cons".len() }),
             Some("lambda") => Some(TokenUnit { token_type: TokenType::Lambda, table_ptr: "lambda".len() }),
-            Some("display") => Some(TokenUnit { token_type: TokenType::Lambda, table_ptr: "display".len() }),
+            Some("display") => Some(TokenUnit { token_type: TokenType::Display, table_ptr: "display".len() }),
             Some("quote") => Some(TokenUnit { token_type: TokenType::Quote, table_ptr: "quote".len() }),
 
             // 单引号识别
