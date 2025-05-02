@@ -4,6 +4,7 @@ use mini_lisp::scanner::{ScanError, scan};
 
 
 fn main() {
+    // 读取命令行参数
     let args: Vec<String> = env::args().collect();
     if args.len() != 2 {
         if args.len() < 2 {
@@ -27,6 +28,7 @@ fn main() {
         }
     };
 
+    // 对 `filename` 做词法分析
     match scan(input.as_str()) {
         Ok((token_sequence, token_table)) => {
             println!("tokens:");
