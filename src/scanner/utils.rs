@@ -156,8 +156,13 @@ fn recog_reserved(line: &str, row: usize, column: usize) -> Option<(TokenUnit, T
             Some("lambda") => Some(TokenUnit { token_type: TokenType::Lambda, table_ptr: "lambda".len() }),
             Some("display") => Some(TokenUnit { token_type: TokenType::Lambda, table_ptr: "display".len() }),
             Some("quote") => Some(TokenUnit { token_type: TokenType::Quote, table_ptr: "quote".len() }),
-            Some("\'") => Some(TokenUnit { token_type: TokenType::QuoteMark, table_ptr: "\'".len() }),
+
+            // 单引号识别
             Some(other) => {
+                // 单引号后必须跟其他符号
+                if other.len() == 1 {
+                    return None;
+                }
                 if let Some(start_ch) = other.chars().next() {
                     match start_ch {
                         '\'' => Some(TokenUnit { token_type: TokenType::QuoteMark, table_ptr: 1 }),
