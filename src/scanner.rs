@@ -28,6 +28,7 @@ pub enum TokenType {
     List,
     Cons,
     Lambda,
+    Display,
     Quote,
     QuoteMark,
 
