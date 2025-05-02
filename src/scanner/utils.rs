@@ -46,7 +46,6 @@ fn recog_mark(line: &str, row: usize, column: usize) -> Option<(TokenUnit, Table
         match ch {
             '(' => Some(TokenUnit { token_type: TokenType::LParen, table_ptr: 1 }),
             ')' => Some(TokenUnit { token_type: TokenType::RParen, table_ptr: 1 }),
-            // '\"' => Some(TokenUnit { token_type: TokenType::DQuote, table_ptr: 1 }),
             _ => None,
         }
     } else {

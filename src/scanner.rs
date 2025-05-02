@@ -47,7 +47,6 @@ pub enum TokenType {
     // 其他
     LParen,
     RParen,
-    DQuote,
 }
 
 #[derive(Debug)]
@@ -69,24 +68,37 @@ pub fn scan(input: &str) -> Result<(Vec<TokenUnit>, Vec<TableItem>), ScanError> 
     let mut tokens: Vec<TokenUnit> = Vec::new();
 
     for (row, mut line) in input.lines().enumerate() {
-        let mut column = 0;
+        let mut column = whitespace_cnt(line);
+        line = &line[column..];
+
         while !line.is_empty() {
             match tokenize(line, row, column) {
                 Ok((mut token, table_item)) => {
+                    // 更新column
                     column += token.table_ptr;
+
+                    // 计算切片索引
                     let token_bytes = chars2bytes(line, token.table_ptr);
+
+                    // 添加token序列
                     token.table_ptr = token_table.len();
                     tokens.push(token);
+
+                    // 添加符号表条目
                     token_table.push(table_item);
+
+                    // 切片并去除前导空白符
                     line = &line[token_bytes..];
                     let ws_cnt = whitespace_cnt(line);
                     column += ws_cnt;
                     line = &line[ws_cnt..];
                 },
+
                 Err(scan_error) => match scan_error {
                     ScanError::InvalidCharacter((row, column)) => {
                         panic!("tokenize() failed at row {} column {}: Invalid Character", row + 1, column + 1);
                     },
+
                     ScanError::UnexpectedCharacter((row, column)) => {
                         panic!("tokenize() failed at row {} column {}: Unexpected Character", row + 1, column + 1);
                     }
@@ -100,11 +112,13 @@ pub fn scan(input: &str) -> Result<(Vec<TokenUnit>, Vec<TableItem>), ScanError> 
 
 fn whitespace_cnt(line: &str) -> usize {
     let mut ws_cnt = 0;
+
     for ch in line.chars() {
         if !ch.is_whitespace() {
             return ws_cnt;
         }
         ws_cnt += 1;
     }
+
     ws_cnt
 }
