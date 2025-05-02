@@ -81,6 +81,7 @@ fn recog_const(line: &str, row: usize, column: usize) -> Option<(TokenUnit, Tabl
         return None;
     }
 
+    // 整型、浮点型、布尔型常量识别
     if let Some(first) = line.split_whitespace().next() {
         if let Some(first) = first.split(|c| c == '(' || c == ')' || c == '\"').next() {
             match parse_const(first) {
@@ -118,6 +119,7 @@ fn recog_reserved(line: &str, row: usize, column: usize) -> Option<(TokenUnit, T
                     }
                 } else { None }
             },
+
             _ => None,
         }
     } else { None };
@@ -164,6 +166,7 @@ fn recog_op(line: &str, row: usize, column: usize) -> Option<(TokenUnit, TableIt
                 "-" => Some(TokenUnit { token_type: TokenType::MinusOp, table_ptr: "-".len(), }),
                 "*" => Some(TokenUnit { token_type: TokenType::MulOp, table_ptr: "*".len(), }),
                 "/" => Some(TokenUnit { token_type: TokenType::DivOp, table_ptr: "/".len(), }),
+
                 _ => None,
             }
         } else { None }
@@ -174,6 +177,7 @@ fn recog_op(line: &str, row: usize, column: usize) -> Option<(TokenUnit, TableIt
             index: (row, column),
             value: None,
         })),
+
         _ => None,
     }
 }
@@ -188,6 +192,7 @@ fn recog_cmp(line: &str, row: usize, column: usize) -> Option<(TokenUnit, TableI
                 "<" => Some(TokenUnit { token_type: TokenType::LessThan, table_ptr: "<".len(), }),
                 ">" => Some(TokenUnit { token_type: TokenType::GreaterThan, table_ptr: ">".len(), }),
                 "=" => Some(TokenUnit { token_type: TokenType::Eq, table_ptr: "=".len(), }),
+
                 _ => None,
             }
         } else { None }
@@ -198,6 +203,7 @@ fn recog_cmp(line: &str, row: usize, column: usize) -> Option<(TokenUnit, TableI
             index: (row, column),
             value: None,
         })),
+
         _ => None,
     }
 }
@@ -206,23 +212,29 @@ fn recog_cmp(line: &str, row: usize, column: usize) -> Option<(TokenUnit, TableI
 pub fn chars2bytes(input: &str, charcnt: usize) -> usize {
     let mut bytecnt = 0;
     let mut input_iter = input.chars();
+
     for _ in 0..charcnt {
         if let Some(ch) = input_iter.next() {
             bytecnt += ch.len_utf8();
         }
     }
+
     bytecnt
 }
 
 
+// 将字符串转换为整型、浮点型或布尔型常量
 fn parse_const(input: &str) -> Option<(ValueType, usize)> {
     let token_len= input.len();
+
     if let Ok(int_val) = input.parse::<isize>() {
         return Some((ValueType::Int(int_val), token_len));
     }
+
     if let Ok(float_val) = input.parse::<f64>() {
         return Some((ValueType::Float(float_val), token_len));
     }
+
     match input {
         "#t" => Some((ValueType::Bool(true), token_len)),
         "#f" => Some((ValueType::Bool(false), token_len)),
