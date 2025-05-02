@@ -1,31 +1,57 @@
 use std::io::{self, Write};
 use std::{env, process, fs};
+use mini_lisp::scanner::{ScanError, scan};
 
-use mini_lisp::scanner::scan;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
     if args.len() < 2 {
-        panic!("not enough arguments");
+        eprintln!("not enough arguments");
+        process::exit(1);
     }
 
     let filename = &args[1];
-    let input = fs::read_to_string(filename)
-        .expect("Something went wrong reading the file");
+    let input = match fs::read_to_string(filename) {
+        Ok(input) => input,
+        
+        Err(_) => {
+            eprintln!("Something went wrong reading the file");
+            process::exit(1);
+        }
+    };
 
     match scan(input.as_str()) {
         Ok((token_sequence, token_table)) => {
+            println!("tokens:");
             for token in token_sequence {
                 print!("<{:?}, {}> ", token.token_type, token.table_ptr);
                 io::stdout().flush().expect("flush failed");
             }
-            println!("");
+            println!("\n");
+
+            println!("token table:");
             for (i, table_item) in token_table.iter().enumerate() {
-                println!("{}: {:?}", i, table_item);
+                println!("{:>3}: {:?}", i, table_item);
             }
         },
-        _ => {
-            eprintln!("ScanError");
+
+        Err(e) => {
+            match e {
+                ScanError::InvalidCharacter((row, column)) => {
+                    eprintln!(
+                        "tokenize() failed at row {} column {}: Invalid Character",
+                        row + 1, column + 1
+                    );
+                },
+
+                ScanError::UnexpectedCharacter((row, column)) => {
+                    eprintln!(
+                        "tokenize() failed at row {} column {}: Unexpected Character",
+                        row + 1, column + 1
+                    );
+                }
+            };
+
             process::exit(1);
         }
     }
