@@ -17,41 +17,27 @@ pub fn tokenize(line: &str, row: usize, column: usize) -> Result<(TokenUnit, Tab
         return Ok(result);
     }
 
-    // println!("not mark");
-
     if let Some(result) = recog_const(line, row, column) {
         return Ok(result);
     }
-
-    // println!("not const");
 
     if let Some(result) = recog_reserved(line, row, column) {
         return Ok(result);
     }
 
-    // println!("not reserved word");
-
     if let Some(result) = recog_id(line, row, column) {
         return Ok(result);
     }
-
-    // println!("not id");
 
     if let Some(result) = recog_op(line, row, column) {
         return Ok(result);
     }
 
-    // println!("not op");
-
     if let Some(result) = recog_cmp(line, row, column) {
         return Ok(result);
     }
 
-    // println!("not cmp");
-
     Err(ScanError::InvalidCharacter((row, column)))
-
-    // Err(ScanError::InvalidCharacter(0))
 }
 
 
