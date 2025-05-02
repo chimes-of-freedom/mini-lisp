@@ -5,10 +5,17 @@ use mini_lisp::scanner::{ScanError, scan};
 
 fn main() {
     let args: Vec<String> = env::args().collect();
-    if args.len() < 2 {
-        eprintln!("not enough arguments");
+    if args.len() != 2 {
+        if args.len() < 2 {
+            eprintln!("not enough arguments");
+        } else if args.len() > 2 {
+            eprintln!("too many arguments");
+        }
+
+        eprintln!("usage: mini_lisp <filename>");
         process::exit(1);
     }
+
 
     let filename = &args[1];
     let input = match fs::read_to_string(filename) {
