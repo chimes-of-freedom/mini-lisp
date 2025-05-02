@@ -97,7 +97,7 @@ pub enum TokenType {
     GreaterEq,
     Eq,
 
-    // 其他
+    // 界定符（不含双引号）
     LParen,
     RParen,
 }

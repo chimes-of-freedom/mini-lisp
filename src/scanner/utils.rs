@@ -68,19 +68,19 @@ fn generate_valid_chars() -> Vec<char> {
     // 添加下划线
     valid_chars.push('_');
     
-    // 添加算术运算符
+    // 添加算术运算符号
     valid_chars.extend(['+', '-', '*', '/']);
     
-    // 添加比较运算符
+    // 添加比较运算符号
     valid_chars.extend(['=', '<', '>']);
     
-    // 添加数字
+    // 添加数位
     valid_chars.extend('0'..='9');
     
-    // 添加括号
+    // 添加圆括号
     valid_chars.extend(['(', ')']);
     
-    // 添加引号
+    // 添加单、双引号
     valid_chars.extend(['\'', '"']);
 
     valid_chars
