@@ -44,9 +44,9 @@ fn main() {
                     );
                 },
 
-                ScanError::UnexpectedCharacter((row, column)) => {
+                ScanError::InvalidToken((row, column)) => {
                     eprintln!(
-                        "tokenize() failed at row {} column {}: Unexpected Character",
+                        "tokenize() failed at row {} column {}: Invalid Token",
                         row + 1, column + 1
                     );
                 }

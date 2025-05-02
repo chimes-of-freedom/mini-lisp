@@ -37,7 +37,53 @@ pub fn tokenize(line: &str, row: usize, column: usize) -> Result<(TokenUnit, Tab
         return Ok(result);
     }
 
-    Err(ScanError::InvalidCharacter((row, column)))
+    if let Some(token) = line.split_whitespace().next() {
+        detect_invalid_char(token, row, column)?;
+    }
+
+    Err(ScanError::InvalidToken((row, column)))
+}
+
+
+fn detect_invalid_char(token: &str, row: usize, column: usize) -> Result<(), ScanError> {
+    let valid_chars: Vec<char> = generate_valid_chars();
+
+    for (i, ch) in token.chars().enumerate() {
+        if !valid_chars.contains(&ch) {
+            return Err(ScanError::InvalidCharacter((row, column + i)));
+        }
+    }
+
+    Ok(())
+}
+
+
+fn generate_valid_chars() -> Vec<char> {
+    let mut valid_chars: Vec<char> = Vec::new();
+    
+    // 添加大小写字母
+    valid_chars.extend('A'..='Z');
+    valid_chars.extend('a'..='z');
+    
+    // 添加下划线
+    valid_chars.push('_');
+    
+    // 添加算术运算符
+    valid_chars.extend(['+', '-', '*', '/']);
+    
+    // 添加比较运算符
+    valid_chars.extend(['=', '<', '>']);
+    
+    // 添加数字
+    valid_chars.extend('0'..='9');
+    
+    // 添加括号
+    valid_chars.extend(['(', ')']);
+    
+    // 添加引号
+    valid_chars.extend(['\'', '"']);
+
+    valid_chars
 }
 
 
