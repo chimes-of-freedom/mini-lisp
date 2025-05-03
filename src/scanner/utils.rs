@@ -156,8 +156,10 @@ fn recog_reserved(line: &str, row: usize, column: usize) -> Option<(TokenUnit, T
             Some("lambda") => Some(TokenUnit { token_type: TokenType::Lambda, table_ptr: "lambda".len() }),
             Some("display") => Some(TokenUnit { token_type: TokenType::Display, table_ptr: "display".len() }),
             Some("quote") => Some(TokenUnit { token_type: TokenType::Quote, table_ptr: "quote".len() }),
+            // "单引号+定界符"形式识别
+            Some("'") => Some(TokenUnit { token_type: TokenType::QuoteMark, table_ptr: "'".len() }),
 
-            // 单引号识别
+            // "单引号+非定界符"形式识别
             Some(other) => {
                 // 单引号后必须跟其他符号
                 if other.len() == 1 {
