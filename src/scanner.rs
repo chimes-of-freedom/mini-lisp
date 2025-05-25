@@ -1,6 +1,6 @@
 mod utils;
 use utils::{tokenize, chars2bytes};
-use super::{TokenType, TokenUnit, ValueType, TableItem};
+use crate::{TokenType, TokenUnit, ValueType, TableItem};
 
 
 pub fn scan(input: &str) -> Result<(Vec<TokenUnit>, Vec<TableItem>), ScanError> {
