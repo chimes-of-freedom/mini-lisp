@@ -65,8 +65,8 @@ fn generate_valid_chars() -> Vec<char> {
     valid_chars.extend('A'..='Z');
     valid_chars.extend('a'..='z');
     
-    // 添加下划线
-    valid_chars.push('_');
+    // 添加特殊字符
+    valid_chars.extend(['-', '_', '?', '!']);
     
     // 添加算术运算符号
     valid_chars.extend(['+', '-', '*', '/']);
@@ -194,7 +194,7 @@ fn recog_id(line: &str, row: usize, column: usize) -> Option<(TokenUnit, TableIt
                     if i == 0 && ch.is_digit(10) {
                         return None;
                     }
-                    if !ch.is_alphabetic() && !ch.is_numeric() && ch != '_' {
+                    if !ch.is_alphabetic() && !ch.is_numeric() && "-_?!".find(ch) == None {
                         return None;
                     }
                 }
