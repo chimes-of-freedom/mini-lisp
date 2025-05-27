@@ -8,7 +8,7 @@ pub struct TokenUnit {
 }
 
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub enum TokenType {
     // 标识符
     Id,
@@ -58,4 +58,11 @@ pub enum ValueType {
     Float(f64),
     Str(String),
     Bool(bool),
+}
+
+
+pub enum ParseError {
+    UnexpectedToken,
+    UnexpectedEndOfInput,
+    UnexpectedRemains,
 }

@@ -1,6 +1,7 @@
-use std::io::{self, Write};
 use std::{env, process, fs};
 use mini_lisp::scanner::{ScanError, scan};
+use mini_lisp::parser::parse;
+use mini_lisp::ParseError::*;
 
 
 fn main() {
@@ -27,19 +28,18 @@ fn main() {
         }
     };
 
-    // 对 `filename` 做词法分析
     match scan(input.as_str()) {
-        Ok((token_sequence, token_table)) => {
-            println!("tokens:");
-            for token in token_sequence {
-                print!("<{:?}, {}> ", token.token_type, token.table_ptr);
-                io::stdout().flush().expect("flush failed");
-            }
-            println!("\n");
-
-            println!("token table:");
-            for (i, table_item) in token_table.iter().enumerate() {
-                println!("{:>3}: {:?}", i, table_item);
+        Ok((token_sequence, _)) => {
+            match parse(&token_sequence) {
+                Ok(()) => println!("parsing success"),
+                Err(e) => {
+                    match e {
+                        UnexpectedToken => eprintln!("parsing failed: Unexpected Token"),
+                        UnexpectedRemains => eprintln!("parsing failed: Unexpected Remains"),
+                        UnexpectedEndOfInput => eprintln!("parsing failed: Unexpected End Of Input")
+                    }
+                    process::exit(1);
+                }
             }
         },
 
