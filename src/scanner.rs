@@ -1,6 +1,6 @@
 mod utils;
 use utils::{tokenize, chars2bytes};
-use crate::{TokenType, TokenUnit, ValueType, TableItem};
+use crate::{TokenUnit, TableItem, ScanError};
 
 
 pub fn scan(input: &str) -> Result<(Vec<TokenUnit>, Vec<TableItem>), ScanError> {
@@ -50,12 +50,4 @@ fn whitespace_cnt(line: &str) -> usize {
     }
 
     ws_cnt
-}
-
-
-pub enum ScanError {
-    // 不会出现在Lisp中的字符
-    InvalidCharacter((usize, usize)),
-    // 不符合词法规则的串
-    InvalidToken((usize, usize)),
 }

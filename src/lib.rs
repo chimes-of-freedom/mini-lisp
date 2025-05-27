@@ -61,6 +61,14 @@ pub enum ValueType {
 }
 
 
+pub enum ScanError {
+    // 不会出现在Lisp中的字符
+    InvalidCharacter((usize, usize)),
+    // 不符合词法规则的串
+    InvalidToken((usize, usize)),
+}
+
+
 pub enum ParseError {
     UnexpectedToken,
     UnexpectedEndOfInput,

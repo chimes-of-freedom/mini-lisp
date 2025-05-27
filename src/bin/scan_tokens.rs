@@ -1,6 +1,7 @@
 use std::io::{self, Write};
 use std::{env, process, fs};
-use mini_lisp::scanner::{ScanError, scan};
+use mini_lisp::ScanError;
+use mini_lisp::scanner::scan;
 
 
 fn main() {

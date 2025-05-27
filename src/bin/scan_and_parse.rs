@@ -1,5 +1,6 @@
 use std::{env, fs, io::{self, Write}, process};
-use mini_lisp::scanner::{ScanError, scan};
+use mini_lisp::ScanError;
+use mini_lisp::scanner::scan;
 use mini_lisp::parser::parse;
 use mini_lisp::ParseError::*;
 

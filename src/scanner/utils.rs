@@ -1,4 +1,4 @@
-use super::{ScanError, TokenUnit, TokenType, TableItem, ValueType};
+use crate::{ScanError, TokenUnit, TokenType, TableItem, ValueType};
 
 
 // 功能：
