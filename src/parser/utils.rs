@@ -1,17 +1,20 @@
-use crate::{ParseError::{self, *}, TokenType::{self, *}, TokenUnit};
+use crate::{ParseError::{self, *}, TableItem, TokenType::{self, *}, TokenUnit};
 
 
 // 开始符号的子程序：`start -> (list) | atom`
-pub fn parse_start(tokens: &[TokenUnit]) -> Result<&[TokenUnit], ParseError> {
+pub fn parse_start<'a>(tokens: &'a [TokenUnit], token_table: &Vec<TableItem>) -> Result<&'a [TokenUnit], ParseError> {
     if let Some(first) = tokens.get(0) {
         if is_atom(first.token_type) {
-            expect_ts(tokens, first.token_type)
+            expect_ts(tokens, token_table, first.token_type)
         } else if first.token_type == LParen {
-            let tokens = expect_ts(tokens, LParen)?;
-            let tokens = parse_list(tokens)?;
-            Ok(expect_ts(tokens, RParen)?)
+            let tokens = expect_ts(tokens, token_table, LParen)?;
+            let tokens = parse_list(tokens, token_table)?;
+            Ok(expect_ts(tokens, token_table, RParen)?)
         } else {
-            Err(UnexpectedToken)
+            match token_table.get(first.table_ptr) {
+                Some(table_item) => Err(UnexpectedToken(table_item.index)),
+                None => Err(UnknownScanError)
+            }
         }
     } else {
         Err(UnexpectedEndOfInput)
@@ -20,16 +23,19 @@ pub fn parse_start(tokens: &[TokenUnit]) -> Result<&[TokenUnit], ParseError> {
 
 
 // 非终结符list的子程序：`list -> start list | epsilon`
-fn parse_list(tokens: &[TokenUnit]) -> Result<&[TokenUnit], ParseError> {
+fn parse_list<'a>(tokens: &'a [TokenUnit], token_table: &Vec<TableItem>) -> Result<&'a [TokenUnit], ParseError> {
     match tokens.get(0) {
         Some(token_unit) => {
             if token_unit.token_type == LParen || is_atom(token_unit.token_type) {
-                let tokens = parse_start(tokens)?;
-                Ok(parse_list(tokens)?)
+                let tokens = parse_start(tokens, token_table)?;
+                Ok(parse_list(tokens, token_table)?)
             } else if token_unit.token_type == RParen {
                 Ok(tokens)
             } else {
-                Err(UnexpectedToken)
+                match token_table.get(token_unit.table_ptr) {
+                    Some(table_item) => Err(UnexpectedToken(table_item.index)),
+                    None => Err(UnknownScanError)
+                }
             }
         },
         None => Err(UnexpectedEndOfInput)
@@ -38,12 +44,15 @@ fn parse_list(tokens: &[TokenUnit]) -> Result<&[TokenUnit], ParseError> {
 
 
 // 试图匹配1个指定的终结符
-fn expect_ts(tokens: &[TokenUnit], ts: TokenType) -> Result<&[TokenUnit], ParseError> {
+fn expect_ts<'a>(tokens: &'a [TokenUnit], token_table: &Vec<TableItem>, ts: TokenType) -> Result<&'a [TokenUnit], ParseError> {
     if let Some(token_unit) = tokens.get(0) {
         if token_unit.token_type == ts {
             Ok(&tokens[1..])
         } else {
-            Err(UnexpectedToken)
+            match token_table.get(token_unit.table_ptr) {
+                Some(table_item) => Err(UnexpectedToken(table_item.index)),
+                None => Err(UnknownScanError)
+            }
         }
     } else {
         Err(UnexpectedEndOfInput)

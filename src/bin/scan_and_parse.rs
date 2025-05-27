@@ -52,13 +52,14 @@ fn main() {
             println!("====================");
             println!("====== Parser ======");
             println!("====================");
-            match parse(&token_sequence) {
+            match parse(&token_sequence, &token_table) {
                 Ok(()) => println!("parsing success"),
                 Err(e) => {
                     match e {
-                        UnexpectedToken => eprintln!("parsing failed: Unexpected Token"),
+                        UnexpectedToken((x, y)) => eprintln!("parsing failed: Unexpected Token at row {} column {}", x + 1, y + 1),
                         UnexpectedRemains => eprintln!("parsing failed: Unexpected Remains"),
-                        UnexpectedEndOfInput => eprintln!("parsing failed: Unexpected End Of Input")
+                        UnexpectedEndOfInput => eprintln!("parsing failed: Unexpected End Of Input"),
+                        UnknownScanError => eprintln!("parsing failed: Unknown Scan Error"),
                     }
                     process::exit(1);
                 }
