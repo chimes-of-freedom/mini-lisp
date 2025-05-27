@@ -72,6 +72,5 @@ pub enum ScanError {
 pub enum ParseError {
     UnexpectedToken((usize, usize)),
     UnexpectedEndOfInput,
-    UnexpectedRemains,
     UnknownScanError,
 }

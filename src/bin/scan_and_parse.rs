@@ -56,10 +56,9 @@ fn main() {
                 Ok(()) => println!("parsing success"),
                 Err(e) => {
                     match e {
-                        UnexpectedToken((x, y)) => eprintln!("parsing failed: Unexpected Token at row {} column {}", x + 1, y + 1),
-                        UnexpectedRemains => eprintln!("parsing failed: Unexpected Remains"),
-                        UnexpectedEndOfInput => eprintln!("parsing failed: Unexpected End Of Input"),
-                        UnknownScanError => eprintln!("parsing failed: Unknown Scan Error"),
+                        UnexpectedToken((x, y)) => eprintln!("parse() failed at row {} column {}: Unexpected Token", x + 1, y + 1),
+                        UnexpectedEndOfInput => eprintln!("parse() failed: Unexpected End Of Input"),
+                        UnknownScanError => eprintln!("parse() failed: Unknown Scan Error"),
                     }
                     process::exit(1);
                 }
