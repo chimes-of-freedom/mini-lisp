@@ -1,8 +1,16 @@
 use crate::{ParseError::{self, *}, TableItem, TokenType::{self, *}, TokenUnit};
 
 
-// 开始符号的子程序：`start -> (list) | atom`
+// 开始符号的子程序：`start -> '(list) | (list) | 'atom | atom`
 pub fn parse_start<'a>(tokens: &'a [TokenUnit], token_table: &Vec<TableItem>) -> Result<&'a [TokenUnit], ParseError> {
+    // 匹配可选的`'`
+    let mut tokens = tokens;
+    if let Some(first) = tokens.get(0) {
+        if first.token_type == QuoteMark {
+            tokens = expect_ts(tokens, token_table, QuoteMark)?;
+        }
+    }
+
     if let Some(first) = tokens.get(0) {
         if is_atom(first.token_type) {
             expect_ts(tokens, token_table, first.token_type)
