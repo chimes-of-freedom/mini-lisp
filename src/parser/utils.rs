@@ -34,7 +34,7 @@ pub fn parse_start<'a>(tokens: &'a [TokenUnit], token_table: &Vec<TableItem>) ->
 fn parse_list<'a>(tokens: &'a [TokenUnit], token_table: &Vec<TableItem>) -> Result<&'a [TokenUnit], ParseError> {
     match tokens.get(0) {
         Some(token_unit) => {
-            if token_unit.token_type == LParen || is_atom(token_unit.token_type) {
+            if token_unit.token_type == LParen || is_atom(token_unit.token_type) || token_unit.token_type == QuoteMark {
                 let tokens = parse_start(tokens, token_table)?;
                 Ok(parse_list(tokens, token_table)?)
             } else if token_unit.token_type == RParen {
