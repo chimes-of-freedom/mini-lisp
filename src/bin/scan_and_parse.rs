@@ -1,4 +1,4 @@
-use std::{env, process, fs};
+use std::{env, fs, io::{self, Write}, process};
 use mini_lisp::scanner::{ScanError, scan};
 use mini_lisp::parser::parse;
 use mini_lisp::ParseError::*;
@@ -29,7 +29,28 @@ fn main() {
     };
 
     match scan(input.as_str()) {
-        Ok((token_sequence, _)) => {
+        Ok((token_sequence, token_table)) => {
+            // 输出词法分析结果
+            println!("=====================");
+            println!("====== Scanner ======");
+            println!("=====================");
+            println!("tokens:");
+            for token in token_sequence.iter() {
+                print!("<{:?}, {}> ", token.token_type, token.table_ptr);
+                io::stdout().flush().expect("flush failed");
+            }
+            println!("\n");
+
+            println!("token table:");
+            for (i, table_item) in token_table.iter().enumerate() {
+                println!("{:>3}: {:?}", i, table_item);
+            }
+
+            // 输出语法分析结果
+            println!("\n");
+            println!("====================");
+            println!("====== Parser ======");
+            println!("====================");
             match parse(&token_sequence) {
                 Ok(()) => println!("parsing success"),
                 Err(e) => {
