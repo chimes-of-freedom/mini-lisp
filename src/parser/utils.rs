@@ -70,5 +70,5 @@ fn expect_ts<'a>(tokens: &'a [TokenUnit], token_table: &Vec<TableItem>, ts: Toke
 
 // 检验token是否为终结符atom
 fn is_atom(token_type: TokenType) -> bool {
-    token_type != LParen && token_type != RParen
+    token_type != LParen && token_type != RParen && token_type != QuoteMark
 }
