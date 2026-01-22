@@ -13,12 +13,16 @@ struct Cli {
 
 #[derive(Args, Debug)]
 struct CommonArgs {
+    /// mini-lisp source code
     name: PathBuf,
 }
 
 #[derive(Subcommand)]
 enum Commands {
+    /// do lexical analysis
     Scan(CommonArgs),
+
+    /// do lexical and syntax analysis
     Parse(CommonArgs),
 }
 
