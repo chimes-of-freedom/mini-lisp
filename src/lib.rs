@@ -61,6 +61,7 @@ pub enum ValueType {
 }
 
 
+#[derive(Debug)]
 pub enum ScanError {
     // 不会出现在Lisp中的字符
     InvalidCharacter((usize, usize)),
@@ -69,6 +70,7 @@ pub enum ScanError {
 }
 
 
+#[derive(Debug)]
 pub enum ParseError {
     UnexpectedToken((usize, usize)),
     UnexpectedEndOfInput,
